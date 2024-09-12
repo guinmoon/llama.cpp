@@ -34,6 +34,7 @@ static bool eval_id(struct llama_context * ctx_llama, int id, int * n_past) {
     return eval_tokens(ctx_llama, tokens, 1, n_past);
 }
 
+
 static bool eval_string(struct llama_context * ctx_llama, const char* str, int n_batch, int * n_past, bool add_bos){
     std::string              str2     = str;
     std::vector<llama_token> embd_inp = ::llama_tokenize(ctx_llama, str2, add_bos, true);
@@ -236,7 +237,7 @@ static struct llava_context * llava_init_context(gpt_params * params, llama_mode
         prompt = "describe the image in detail.";
     }
 
-    auto ctx_clip = clip_model_load(clip_path, /*verbosity=*/ 1);
+    auto ctx_clip = clip_model_load(clip_path, /*verbosity=*/ 1,params->n_gpu_layers);
 
 
     llama_context_params ctx_params = llama_context_params_from_gpt_params(*params);
@@ -274,65 +275,65 @@ static void llama_log_callback_logTee(ggml_log_level level, const char * text, v
     LOG_TEE("%s", text);
 }
 
-int main(int argc, char ** argv) {
-    ggml_time_init();
+// int run_llava(int argc, char ** argv, bool(*swift_callback)(const char*)) {
+//     ggml_time_init();
 
-    gpt_params params;
+//     gpt_params params;
 
-    if (!gpt_params_parse(argc, argv, params, LLAMA_EXAMPLE_LLAVA, print_usage)) {
-        return 1;
-    }
+//     if (!gpt_params_parse(argc, argv, params, LLAMA_EXAMPLE_LLAVA, print_usage)) {
+//         return 1;
+//     }
 
-#ifndef LOG_DISABLE_LOGS
-    log_set_target(log_filename_generator("llava", "log"));
-    LOG_TEE("Log start\n");
-    log_dump_cmdline(argc, argv);
-    llama_log_set(llama_log_callback_logTee, nullptr);
-#endif // LOG_DISABLE_LOGS
+// #ifndef LOG_DISABLE_LOGS
+//     log_set_target(log_filename_generator("llava", "log"));
+//     LOG_TEE("Log start\n");
+//     log_dump_cmdline(argc, argv);
+//     llama_log_set(llama_log_callback_logTee, nullptr);
+// #endif // LOG_DISABLE_LOGS
 
-    if (params.mmproj.empty() || (params.image.empty() && !prompt_contains_image(params.prompt))) {
-        print_usage(argc, argv);
-        return 1;
-    }
-    auto model = llava_init(&params);
-    if (model == NULL) {
-        fprintf(stderr, "%s: error: failed to init llava model\n", __func__);
-        return 1;
-    }
+//     if (params.mmproj.empty() || (params.image.empty() && !prompt_contains_image(params.prompt))) {
+//         print_usage(argc, argv);
+//         return 1;
+//     }
+//     auto model = llava_init(&params);
+//     if (model == NULL) {
+//         fprintf(stderr, "%s: error: failed to init llava model\n", __func__);
+//         return 1;
+//     }
 
-    if (prompt_contains_image(params.prompt)) {
-        auto ctx_llava = llava_init_context(&params, model);
+//     if (prompt_contains_image(params.prompt)) {
+//         auto ctx_llava = llava_init_context(&params, model);
 
-        auto image_embed = load_image(ctx_llava, &params, "");
+//         auto image_embed = load_image(ctx_llava, &params, "");
 
-        // process the prompt
-        process_prompt(ctx_llava, image_embed, &params, params.prompt);
+//         // process the prompt
+//         process_prompt(ctx_llava, image_embed, &params, params.prompt);
 
-        llama_perf_print(ctx_llava->ctx_llama, LLAMA_PERF_TYPE_CONTEXT);
-        llava_image_embed_free(image_embed);
-        ctx_llava->model = NULL;
-        llava_free(ctx_llava);
-    } else {
-        for (auto & image : params.image) {
-            auto ctx_llava = llava_init_context(&params, model);
+//         llama_perf_print(ctx_llava->ctx_llama, LLAMA_PERF_TYPE_CONTEXT);
+//         llava_image_embed_free(image_embed);
+//         ctx_llava->model = NULL;
+//         llava_free(ctx_llava);
+//     } else {
+//         for (auto & image : params.image) {
+//             auto ctx_llava = llava_init_context(&params, model);
 
-            auto image_embed = load_image(ctx_llava, &params, image);
-            if (!image_embed) {
-                std::cerr << "error: failed to load image " << image << ". Terminating\n\n";
-                return 1;
-            }
+//             auto image_embed = load_image(ctx_llava, &params, image);
+//             if (!image_embed) {
+//                 std::cerr << "error: failed to load image " << image << ". Terminating\n\n";
+//                 return 1;
+//             }
 
-            // process the prompt
-            process_prompt(ctx_llava, image_embed, &params, params.prompt);
+//             // process the prompt
+//             process_prompt(ctx_llava, image_embed, &params, params.prompt);
 
-            llama_perf_print(ctx_llava->ctx_llama, LLAMA_PERF_TYPE_CONTEXT);
-            llava_image_embed_free(image_embed);
-            ctx_llava->model = NULL;
-            llava_free(ctx_llava);
-        }
-    }
+//             llama_perf_print(ctx_llava->ctx_llama, LLAMA_PERF_TYPE_CONTEXT);
+//             llava_image_embed_free(image_embed);
+//             ctx_llava->model = NULL;
+//             llava_free(ctx_llava);
+//         }
+//     }
 
-    llama_free_model(model);
+//     llama_free_model(model);
 
-    return 0;
-}
+//     return 0;
+// }

@@ -49,8 +49,8 @@
 #endif
 
 #include "sgemm.h"
-#include "ggml-impl.h"
-#include "ggml-quants.h"
+#include "../ggml-impl.h"
+#include "../ggml-quants.h"
 
 #ifdef _MSC_VER
 #define NOINLINE __declspec(noinline)

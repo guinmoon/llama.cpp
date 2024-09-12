@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
+
 
 #ifdef LLAMA_SHARED
 #    if defined(_WIN32) && !defined(__MINGW32__)
@@ -39,7 +41,7 @@ struct clip_image_f32_batch {
     size_t size;
 };
 
-CLIP_API struct clip_ctx * clip_model_load    (const char * fname, int verbosity);
+CLIP_API struct clip_ctx * clip_model_load    (const char * fname, int verbosity, int ngl);
 CLIP_API struct clip_ctx * clip_model_load_cpu(const char * fname, int verbosity);
 
 CLIP_API void clip_free(struct clip_ctx * ctx);
