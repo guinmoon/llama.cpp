@@ -35,6 +35,7 @@ static bool eval_id(struct llama_context * ctx_llama, int id, int * n_past) {
     return eval_tokens(ctx_llama, tokens, 1, n_past);
 }
 
+
 static bool eval_string(struct llama_context * ctx_llama, const char* str, int n_batch, int * n_past, bool add_bos){
     std::string              str2     = str;
     std::vector<llama_token> embd_inp = ::llama_tokenize(ctx_llama, str2, add_bos, true);
@@ -237,7 +238,7 @@ static struct llava_context * llava_init_context(gpt_params * params, llama_mode
         prompt = "describe the image in detail.";
     }
 
-    auto ctx_clip = clip_model_load(clip_path, /*verbosity=*/ 1);
+    auto ctx_clip = clip_model_load(clip_path, /*verbosity=*/ 1,params->n_gpu_layers);
 
 
     llama_context_params ctx_params = llama_context_params_from_gpt_params(*params);
@@ -269,7 +270,7 @@ static void llava_free(struct llava_context * ctx_llava) {
     llama_backend_free();
 }
 
-int main(int argc, char ** argv) {
+int run_llava(int argc, char ** argv, bool(*swift_callback)(const char*)) {
     ggml_time_init();
 
     gpt_params params;
