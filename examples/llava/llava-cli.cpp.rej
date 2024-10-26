@@ -1,0 +1,17 @@
+@@ -1,11 +1,12 @@
+-#include "ggml.h"
+-#include "log.h"
+-#include "common.h"
++#include "../ggml/ggml.h"
++#include "../ggml/ggml.h"
++#include "../ggml/common.h"
+ #include "clip.h"
+ #include "llava.h"
+ #include "llama.h"
++#include "llava-cli.h"
+ 
+-#include "base64.hpp"
++#include "../ggml/base64.hpp"
+ 
+ #include <cstdio>
+ #include <cstdlib>
