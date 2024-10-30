@@ -1028,7 +1028,7 @@ static ggml_cgraph * clip_image_build_graph(clip_ctx * ctx, const clip_image_f32
 }
 
 // read and create ggml_context containing the tensors and their data
-struct clip_ctx * clip_model_load(const char * fname, const int verbosity = 1) {
+struct clip_ctx * clip_model_load(const char * fname, const int verbosity = 1, int ngl = 0) {
     struct ggml_context * meta = NULL;
 
     struct gguf_init_params params = {
@@ -1147,8 +1147,10 @@ struct clip_ctx * clip_model_load(const char * fname, const int verbosity = 1) {
 #endif
 
 #ifdef GGML_USE_METAL
+if (ngl>0){
     new_clip->backend = ggml_backend_metal_init();
     LOG_INF("%s: CLIP using Metal backend\n", __func__);
+}
 #endif
 
 #ifdef GGML_USE_CANN
