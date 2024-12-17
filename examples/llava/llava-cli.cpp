@@ -237,7 +237,7 @@ static struct llava_context * llava_init_context(common_params * params, llama_m
         prompt = "describe the image in detail.";
     }
 
-    auto ctx_clip = clip_model_load(clip_path, /*verbosity=*/ 1);
+    auto ctx_clip = clip_model_load(clip_path, /*verbosity=*/ 1,params->n_gpu_layers);
 
 
     llama_context_params ctx_params = common_context_params_to_llama(*params);
@@ -269,7 +269,7 @@ static void llava_free(struct llava_context * ctx_llava) {
     llama_backend_free();
 }
 
-int main(int argc, char ** argv) {
+int run_llava(int argc, char ** argv, bool(*swift_callback)(const char*)){
     ggml_time_init();
 
     common_params params;
